@@ -124,6 +124,7 @@ export interface Expectations {
     suraSaCount: number;
     asesoraVentasCount: number;
     actualizadoReferenceId: string;
+    actualizadoDocId: string;
   };
   cedula: {
     total: number;
@@ -666,6 +667,7 @@ export function computeExpectations(docs: LiquidDataDocument[]): Expectations {
       suraSaCount: suraSa.length,
       asesoraVentasCount: asesoraVentas.length,
       actualizadoReferenceId: actualizadoDoc?.process.referenceId ?? "unknown",
+      actualizadoDocId: actualizadoDoc?._id ?? "unknown",
     },
     cedula: {
       total: cedulaDocs.length,

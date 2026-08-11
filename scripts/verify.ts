@@ -91,7 +91,7 @@ async function main(): Promise<void> {
     `expected count ${manizalesCount}`,
   );
 
-  const judgment = await assess.invoke({ subjectId: exp.cartaLaboral.actualizadoReferenceId });
+  const judgment = await assess.invoke({ subjectId: exp.cartaLaboral.actualizadoDocId });
   check("hybrid assess produces a non-empty result", judgment.trim().length > 0);
   check("hybrid assess reaches a verdict token", /CONSISTENT|INCONSISTENT|NEEDS REVIEW/i.test(judgment));
 

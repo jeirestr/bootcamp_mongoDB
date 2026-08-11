@@ -33,29 +33,20 @@ async function findRelatedRecords(record: Document): Promise<Document[]> {
   const cfg = getConfig();
   const db = await getDb();
 
-  const at = record.timestamp instanceof Date ? record.timestamp : null;
-  const sameTransaction: Filter<Document>[] = [{ userId: record.userId }];
-  if (typeof record.amount === "number" && record.amount > 0) {
-    sameTransaction.push({ amount: record.amount });
-  }
+  // For liquidData: find other documents with the same process.referenceId
+  // (e.g. the NUEVO+ACTUALIZADO pair for the same source file).
+  const refId: unknown = record.process?.referenceId;
+  if (!refId) return [];
 
   const filter: Filter<Document> = {
     _id: { $ne: record._id },
-    $or: sameTransaction,
-    ...(at
-      ? {
-          timestamp: {
-            $gte: new Date(at.getTime() - RELATED_WINDOW_MS),
-            $lte: new Date(at.getTime() + RELATED_WINDOW_MS),
-          },
-        }
-      : {}),
+    "process.referenceId": refId,
   };
 
   return db
     .collection(cfg.EVENTS_COLLECTION)
     .find(filter)
-    .sort({ timestamp: 1 })
+    .sort({ bdtlRecordDate: 1 })
     .limit(RELATED_LIMIT)
     .toArray();
 }
@@ -85,7 +76,11 @@ export const assess = tool(
 
     // Leg 2: retrieval. Seed the query with the record's salient fields so the
     // most relevant policy passages surface.
-    const retrievalQuery = `${focus} action=${String(record.action)} amount=${String(record.amount)} channel=${String(record.channel)} status=${String(record.status)}`;
+    const subtype = String(record.document?.subtype ?? "");
+    const statusValue = String(record.status?.value ?? "");
+    const processName = String(record.process?.name ?? "");
+    const channel = String(record.processing?.channel?.value ?? "");
+    const retrievalQuery = `${focus} document type=${subtype} status=${statusValue} process=${processName} channel=${channel}`;
     const passages = await retrievePassages(retrievalQuery);
 
     // Fusion: reason over both, cite the passages.
