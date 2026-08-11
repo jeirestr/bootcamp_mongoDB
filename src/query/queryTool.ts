@@ -84,13 +84,13 @@ export const structuredQuery = tool(
     description:
       "Answer factual or analytical questions over structured records by generating and running a MongoDB " +
       "aggregation pipeline (counts, sums, rankings, who/when/how-much). Returns the records, a plain-language " +
-      "explanation of the query, and the pipeline that ran. Defaults to the activity_events collection.",
+      "explanation of the query, and the pipeline that ran. Defaults to the liquidData collection.",
     schema: z.object({
       question: z.string().describe("The natural-language question to answer over the structured data."),
       collection: z
         .string()
         .optional()
-        .describe("Target collection name. Defaults to the configured activity_events collection."),
+        .describe("Target collection name. Defaults to the configured liquidData collection."),
     }),
   },
 );

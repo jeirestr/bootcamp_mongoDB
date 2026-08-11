@@ -129,9 +129,10 @@ async function loadEvents(): Promise<number> {
   const events = generateActivityEvents(); // asserts internal consistency
   await collection.insertMany(events as unknown as Array<Record<string, unknown>>);
 
-  await collection.createIndex({ userId: 1 });
-  await collection.createIndex({ action: 1 });
-  await collection.createIndex({ timestamp: 1 });
+  await collection.createIndex({ "document.subtype": 1 });
+  await collection.createIndex({ "process.name": 1 });
+  await collection.createIndex({ "status.value": 1 });
+  await collection.createIndex({ bdtlRecordDate: 1 });
 
   console.log(`  Events: ${events.length} documents into "${cfg.EVENTS_COLLECTION}" (+ indexes).`);
   return events.length;
